@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* Add styles to make your SVGs look good and position your elements correctly */
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+</head>
+<style type="text/css">
+	.st0{font-family:'Arial';font-weight: bold;}
+	.st1{font-size:16px;}
+	.st2{font-size:10px;}
+	.st3{font-family:'Verdana'; font-weight: bold;}
+	.st4{fill:none;stroke:#000000;stroke-miterlimit:10;}
+	.st5{stroke:#000000;stroke-miterlimit:10;}
+	.st6{fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:10;}
+    .st7{font-family:'Arial';font-size: 11pt;}
+    .movableSVG{max-width: 700px;height: auto;background-color: white;}
+</style>
+<body>
+    <input type="text" id="callsign" placeholder="Enter callsign">
+    <button id="fetchBtn">Fetch Data</button>
+
+    <label for="airports" class="st7">Select aerodrome:</label>
+    <select id="airports" name="airports">
+        <option value="EFET">EFET</option>
+        <option value="EFHA">EFHA</option>
+        <option value="EFIV">EFIV</option>
+        <option value="EFJO">EFJO</option>
+        <option value="EFJY">EFJY</option>
+        <option value="EFKI">EFKI</option>
+        <option value="EFKE">EFKE</option>
+        <option value="EFKT">EFKT</option>
+        <option value="EFKK">EFKK</option>
+        <option value="EFKU">EFKU</option>
+        <option value="EFKS">EFKS</option>
+        <option value="EFLP">EFLP</option>
+        <option value="EFMA">EFMA</option>
+        <option value="EFMI">EFMI</option>
+        <option value="EFOU">EFOU</option>
+        <option value="EFPO">EFPO</option>
+        <option value="EFRO">EFRO</option>
+        <option value="EFSA">EFSA</option>
+        <option value="EFSI">EFSI</option>
+        <option value="EFTP">EFTP</option>
+        <option value="EFTU">EFTU</option>
+        <option value="EFUT">EFUT</option>
+        <option value="EFVA">EFVA</option>
+    </select>
+    <input type="text" id="activeRunway" placeholder="Active RWY" style="width: 80px;">
+    <div id="container"></div>
+    <script>
+        $(document).ready(function() {
+            $('#fetchBtn').click(function() {
+                const callsign = $('#callsign').val();
+                if(callsign) {
+                    $.ajax({
+                        url: 'https://data.vatsim.net/v3/vatsim-data.json',
+                        type: 'GET',
+                        success: function(res) {
+                            const pilots = res.pilots; // search for pilots
+                            for(let pilot of pilots) { // iterate over all pilots
+                                if(pilot.callsign === callsign) { // QTR8P
+                                    let newSVG = $(`<div class='movableSVG'>
+                                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                            viewBox="0 0 488 71" style="enable-background:new 0 0 488 71;" xml:space="preserve">
+                                            <text id="callsign" transform="matrix(1 0 0 1 16 15.9116)" class="st0 st1">OHCAQ</text>
+                                            <text id="rwy" transform="matrix(1 0 0 1 295.1016 15.9116)" class="st0 st1">--</text>
+                                            <text id="adepades" transform="matrix(1 0 0 1 333.2344 15.9116)" class="st0 st1">EFHK EFJY</text>
+                                            <text id="squawk" transform="matrix(1 0 0 1 16 35.9116)" class="st0 st1">5554</text>
+                                            <text id="atyp" xml:space="preserve" transform="matrix(1 0 0 1 16 50.9116)" class="st0 st2">1 L70  L</text>
+                                            <text id="deptime" transform="matrix(1 0 0 1 120 11.9116)" class="st0 st2">1207</text>
+                                            <text id="rfl" transform="matrix(1 0 0 1 174 11.9116)" class="st0 st2">F230</text>
+                                            <text id="ahdg" transform="matrix(1 0 0 1 227 11.9116)" class="st0 st2">--</text>
+                                            <text id="eet" transform="matrix(1 0 0 1 429 15.9116)" class="st0 st2">0045</text>
+                                            <text id="frul" transform="matrix(1 0 0 1 477 11.9116)" class="st3 st2">I</text>
+                                            <text id="spd" transform="matrix(1 0 0 1 16 64.9116)" class="st0 st2">N0114</text>
+                                            <text id="rmk" transform="matrix(1 0 0 1 59 64.9116)" class="st0 st2">PBN/A1B1C1D1L1O1S1 DOF/230715 REG/HSTKY...</text>
+                                            <text id="stripId" transform="matrix(1 0 0 1 412.6211 64.9116)" class="st0 st2">27121720NOTI</text>
+                                            <text id="route" transform="matrix(1 0 0 1 334 30.9116)" class="st0 st2">LILJA RUOKI M857 NUNTO...</text>
+                                            <rect x="0.5" y="0.5" class="st4" width="487" height="70"/>
+                                            <rect x="0.5" y="0.5" class="st5" width="8" height="15"/>
+                                            <rect x="119.5" y="0.5" class="st6" width="53" height="70"/>
+                                            <rect x="225.5" y="0.5" class="st6" width="53" height="70"/>
+                                            <polyline class="st6" points="331.5,71 331.5,34.5 383.5,34.5 383.5,71 "/>
+                                            <polyline class="st6" points="383.5,71 383.5,34.5 435.5,34.5 435.5,71 "/>
+                                            <polyline class="st6" points="435.5,71 435.5,34.5 487.5,34.5 487.5,71 "/>
+                                            <line class="st6" x1="331.5" y1="0.59" x2="331.5" y2="70.59"/>
+                                        </svg>
+                                        <button class='editBtn' style='user-select: none;'>Edit</button>
+                                        <button class='deleteBtn' style='user-select: none;'>Delete</button>
+                                        <button id="printBtn">Print</button>
+                                    </div>`);
+                                    newSVG.find('#callsign').text(pilot.callsign);
+                                    newSVG.find('#squawk').text(pilot.flight_plan.assigned_transponder);
+                                    newSVG.find('#atyp').text("1 " + pilot.flight_plan.aircraft_faa);
+                                    newSVG.find('#spd').text("N0" + pilot.flight_plan.cruise_tas);
+                                    newSVG.find('#deptime').text(pilot.flight_plan.deptime);
+                                    newSVG.find('#eet').text(pilot.flight_plan.enroute_time);
+                                    newSVG.find('#frul').text(pilot.flight_plan.flight_rules);
+                                    newSVG.find('#adepades').text(pilot.flight_plan.departure + " " + pilot.flight_plan.arrival);
+                                    if (pilot.flight_plan.altitude <= 5000) {
+                                        newSVG.find('#rfl').text("A0" + (pilot.flight_plan.altitude / 100));
+                                    } else if (pilot.flight_plan.altitude > 5000 && pilot.flight_plan.altitude < 10000) {
+                                        newSVG.find('#rfl').text("F0" + (pilot.flight_plan.altitude / 100));
+                                    } else {
+                                        newSVG.find('#rfl').text("F" + pilot.flight_plan.altitude / 100);
+                                    }
+                                    if (pilot.flight_plan.remarks.length > 56) {
+                                        let truncatedRemarks = pilot.flight_plan.remarks.substring(0, 56);
+                                        truncatedRemarks = truncatedRemarks.substring(0, Math.min(truncatedRemarks.length, truncatedRemarks.lastIndexOf(" "))).trim() + "...";
+                                        newSVG.find('#rmk').text(truncatedRemarks);
+                                    } else {
+                                        newSVG.find('#rmk').text(pilot.flight_plan.remarks);
+                                    }
+                                    if (pilot.flight_plan.remarks.length > 25) {
+                                        let truncatedRoute = pilot.flight_plan.route.substring(0, 25);
+                                        truncatedRoute = truncatedRoute.substring(0, Math.min(truncatedRoute.length, truncatedRoute.lastIndexOf(" "))).trim() + "...";
+                                        newSVG.find('#route').text(truncatedRoute);
+                                    } else {
+                                        newSVG.find('#route').text(pilot.flight_plan.route);
+                                    }
+                                    newSVG.find('#rwy').text($('#activeRunway').val());
+                                    newSVG.find('#ahdg').text(getAhdg(pilot.flight_plan.route));
+                                    let stripIds = pilot.last_updated.split('T');
+                                    stripIds = stripIds[0].replace(/-/g, "");
+                                    newSVG.find('#stripId').text(stripIds + "NOTI");
+                                    newSVG.draggable();
+                                    $('#container').append(newSVG);
+                                }
+                            }
+                        },
+                        error: function(err) {
+                            console.log(err);
+                        }
+                    });
+                }
+            });
+
+            // delete button listener
+            $(document).on('click', '.deleteBtn', function() {
+                $(this).closest('.movableSVG').remove();
+            });
+        });
+
+        function getAhdg(route) {
+            if (document.getElementById("airports").value == "EFET") {
+                if (route.includes("DOPUD")) return "DOPUD";
+                if (route.includes("EXUTI")) return "EXUTI";
+            }
+            if (document.getElementById("airports").value == "EFHA") {
+                if (route.includes("ARBEV")) return "ARBEV";
+                if (route.includes("ATSEN")) return "ATSEN";
+                if (route.includes("ERTOP")) return "ERTOP";
+                if (route.includes("IBOSU")) return "IBOSU";
+                if (route.includes("OTLUD")) return "OTLUD";
+                if (route.includes("USUPO")) return "USUPO";
+            }
+            if (document.getElementById("airports").value == "EFIV") {
+                if (route.includes("LUSAG")) return "LUSAG";
+                if (route.includes("NEKUX")) return "NEKUX";
+                if (route.includes("SOTIT")) return "SOTIT";
+            }
+            if (document.getElementById("airports").value == "EFJO") {
+                if (route.includes("ETENA")) return "ETENA";
+                if (route.includes("RISEV")) return "RISEV";
+                if (route.includes("UVOVO")) return "UVOVO";
+            }
+            if (document.getElementById("airports").value == "EFJY") {
+                if (route.includes("ADEDO")) return "ADEDO";
+                if (route.includes("ELSOV")) return "ELSOV";
+                if (route.includes("EROKU")) return "EROKU";
+                if (route.includes("LUMME")) return "LUMME";
+                if (route.includes("RERGA")) return "RERGA";
+                if (route.includes("XELMA")) return "XELMA";
+            }
+            if (document.getElementById("airports").value == "EFKI") {
+                if (route.includes("ETROD")) return "ETROD";
+                if (route.includes("EVRIG")) return "EVRIG";
+                if (route.includes("ODRUB")) return "ODRUB";
+                if (route.includes("UBIGA")) return "UBIGA";
+            }
+            if (document.getElementById("airports").value == "EFKE") {
+                if (route.includes("BEXUL")) return "BEXUL";
+                if (route.includes("BURJA")) return "BURJA";
+                if (route.includes("INLEK")) return "INLEK";
+                if (route.includes("NEPIX")) return "NEPIX";
+            }
+            if (document.getElementById("airports").value == "EFKT") {
+                if (route.includes("AMULU")) return "AMULU";
+                if (route.includes("EVIMI")) return "EVIMI";
+                if (route.includes("EXUTI")) return "EXUTI";
+                if (route.includes("TUGPU")) return "TUGPU";
+                if (route.includes("XETMU")) return "XETMU";
+            }
+            if (document.getElementById("airports").value == "EFKK") {
+                if (route.includes("ATPEL")) return "ATPEL";
+                if (route.includes("BAPTU")) return "BAPTU";
+                if (route.includes("EMDUR")) return "EMDUR";
+                if (route.includes("NESUK")) return "NESUK";
+                if (route.includes("VAXUN")) return "VAXUN";
+            }
+            if (document.getElementById("airports").value == "EFKU") {
+                if (route.includes("ASTUX")) return "ASTUX";
+                if (route.includes("ATLUL")) return "ATLUL";
+                if (route.includes("ETENA")) return "ETENA";
+                if (route.includes("NISPO")) return "NISPO";
+                if (route.includes("UGLUM")) return "UGLUM";
+            }
+            if (document.getElementById("airports").value == "EFKS") {
+                if (route.includes("BEVNA")) return "BEVNA";
+                if (route.includes("IBEVU")) return "IBEVU";
+                if (route.includes("OBISO")) return "OBISO";
+            }
+            if (document.getElementById("airports").value == "EFLP") {
+                if (route.includes("ADSEB")) return "ADSEB";
+                if (route.includes("ARLOM")) return "ARLOM";
+                if (route.includes("ERKOM")) return "ERKOM";
+                if (route.includes("SIGGE")) return "SIGGE";
+            }
+            if (document.getElementById("airports").value == "EFMA") {
+                if (route.includes("DODAM")) return "DODAM";
+                if (route.includes("EBEBU")) return "EBEBU";
+                if (route.includes("OGLOB")) return "OGLOB";
+                if (route.includes("RIKUM")) return "RIKUM";
+                if (route.includes("SOTUP")) return "SOTUP";
+            }
+            if (document.getElementById("airports").value == "EFMI") {
+                if (route.includes("REBGO")) return "REBGO";
+                if (route.includes("UXEGA")) return "UXEGA";
+                if (route.includes("VAVED")) return "VAVED";
+            }
+            if (document.getElementById("airports").value == "EFOU") {
+                if (route.includes("ABKEM")) return "ABKEM";
+                if (route.includes("ASLUP")) return "ASLUP";
+                if (route.includes("BURJA")) return "BURJA";
+                if (route.includes("IXONO")) return "IXONO";
+                if (route.includes("MIKNU")) return "MIKNU";
+                if (route.includes("NUBVU")) return "NUBVU";
+                if (route.includes("OTVEM")) return "OTVEM";
+                if (route.includes("SUVIB")) return "SUVIB";
+                if (route.includes("UGMOR")) return "UGMOR";
+                if (route.includes("UPEDU")) return "UPEDU";
+                if (route.includes("XEVAP")) return "XEVAP";
+            }
+            if (document.getElementById("airports").value == "EFPO") {
+                if (route.includes("IDNIS")) return "IDNIS";
+                if (route.includes("KEFFA")) return "KEFFA";
+                if (route.includes("NIFOT")) return "NIFOT";
+                if (route.includes("OSDIL")) return "OSDIL";
+                if (route.includes("ROGTU")) return "ROGTU";
+                if (route.includes("UMSES")) return "UMSES";
+                if (route.includes("XORMU")) return "XORMU";
+            }
+            if (document.getElementById("airports").value == "EFRO") {
+                if (route.includes("ARFUT")) return "ARFUT";
+                if (route.includes("IBSAN")) return "IBSAN";
+                if (route.includes("MARXO")) return "MARXO";
+                if (route.includes("NEMGU")) return "NEMGU";
+                if (route.includes("NEPIX")) return "NEPIX";
+                if (route.includes("OLNOP")) return "OLNOP";
+                if (route.includes("OSLIT")) return "OSLIT";
+                if (route.includes("RENVI")) return "RENVI";
+                if (route.includes("ROTKO")) return "ROTKO";
+            }
+            if (document.getElementById("airports").value == "EFSA") {
+                if (route.includes("ABMAX")) return "ABMAX";
+                if (route.includes("ASPEM")) return "ASPEM";
+                if (route.includes("RIVUM")) return "RIVUM";
+            }
+            if (document.getElementById("airports").value == "EFSI") {
+                if (route.includes("AMASU")) return "AMASU";
+                if (route.includes("GISUX")) return "GISUX";
+                if (route.includes("VABUB")) return "VABUB";
+            }
+            if (document.getElementById("airports").value == "EFTP") {
+                if (route.includes("ARBEV")) return "ARBEV";
+                if (route.includes("ENETI")) return "ENETI";
+                if (route.includes("EVLIT")) return "EVLIT";
+                if (route.includes("GEMKU")) return "GEMKU";
+                if (route.includes("NEBAB")) return "NEBAB";
+                if (route.includes("NISVI")) return "NISVI";
+                if (route.includes("UVEMO")) return "UVEMO";
+                if (route.includes("XORMU")) return "XORMU";
+            }
+            if (document.getElementById("airports").value == "EFTU") {
+                if (route.includes("EMPOM")) return "EMPOM";
+                if (route.includes("EXUPA")) return "EXUPA";
+                if (route.includes("IPMOT")) return "IPMOT";
+                if (route.includes("LIVLU")) return "LIVLU";
+                if (route.includes("NIRPU")) return "NIRPU";
+                if (route.includes("OTKIL")) return "OTKIL";
+                if (route.includes("UPAPU")) return "UPAPU";
+                if (route.includes("UVOPA")) return "UVOPA";
+            }
+            if (document.getElementById("airports").value == "EFUT") {
+                if (route.includes("ARLOM")) return "ARLOM";
+                if (route.includes("NAXEP")) return "NAXEP";
+                if (route.includes("OTKAP")) return "OTKAP";
+                if (route.includes("VEPIN")) return "VEPIN";
+            }
+            if (document.getElementById("airports").value == "EFVA") {
+                if (route.includes("AXUTI")) return "AXUTI";
+                if (route.includes("BEGSU")) return "BEGSU";
+                if (route.includes("BUPEG")) return "BUPEG";
+                if (route.includes("GUBTU")) return "GUBTU";
+                if (route.includes("RERBU")) return "RERBU";
+                if (route.includes("SUBUG")) return "SUBUG";
+                if (route.includes("UVATI")) return "UVATI";
+            }
+            return "";
+        }
+    </script>
+</body>
+</html>
