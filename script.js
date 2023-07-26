@@ -219,6 +219,9 @@ function fetchAll(aerodrome) {
     });
 }
 
+let drawing = false;
+let line;
+
 // Function to create SVG for a pilot
 function createSvg(pilot) {
     let uniqueId = pilot.callsign;
@@ -230,10 +233,10 @@ function createSvg(pilot) {
             <text id="adepades" transform="matrix(1 0 0 1 333.2344 15.9116)" class="st0 st1">EFHK EFJY</text>
             <text id="squawk" transform="matrix(1 0 0 1 16 35.9116)" class="st0 st1">5554</text>
             <text id="atyp" xml:space="preserve" transform="matrix(1 0 0 1 16 50.9116)" class="st0 st2">1 L70  L</text>
-            <text id="deptime" transform="matrix(1 0 0 1 120 11.9116)" class="st0 st2">1207</text>
+            <text id="deptime" transform="matrix(1 0 0 1 120 11.9116)" class="st0 st2"></text>
             <text id="rfl" transform="matrix(1 0 0 1 174 11.9116)" class="st0 st2">F230</text>
             <text id="ahdg" transform="matrix(1 0 0 1 227 11.9116)" class="st0 st2">--</text>
-            <text id="eet" transform="matrix(1 0 0 1 429 15.9116)" class="st0 st2">0045</text>
+            <text id="eet" transform="matrix(1 0 0 1 429 15.9116)" class="st0 st2"></text>
             <text id="frul" transform="matrix(1 0 0 1 477 11.9116)" class="st3 st2">I</text>
             <text id="spd" transform="matrix(1 0 0 1 16 64.9116)" class="st0 st2">N0114</text>
             <text id="rmk" transform="matrix(1 0 0 1 59 64.9116)" class="st0 st2">PBN/A1B1C1D1L1O1S1 DOF/230715 REG/HSTKY...</text>
@@ -248,19 +251,20 @@ function createSvg(pilot) {
             <polyline class="st6" points="435.5,71 435.5,34.5 487.5,34.5 487.5,71 "/>
             <line class="st6" x1="331.5" y1="0.59" x2="331.5" y2="70.59"/>
         </svg> </div>
+        <svg id="drawArea${uniqueId}" style="position:absolute; top:0; left:0; width:100%; height:90%; pointer-events:none;"></svg>
         <button class='deleteBtn' style='user-select: none;'>Delete</button>
-        <button id="printBtn">Print</button>
-        <button id="penTool"><i class="fas fa-pen"></i></button>
+        <button id="printBtn${uniqueId}">Print</button>
+        <button id="penTool${uniqueId}" class='penTool'><i class="fas fa-pen"></i></button>
+        <button id="clearButton${uniqueId}" class='clearButton'><i class="fas fa-undo"></i></button>
         <button id="changeColor${uniqueId}" class="changeColorButton" onclick="changeStripColor('stripBorder${uniqueId}', 'changeColor${uniqueId}');"></button>
     </div>`);
+
     newSVG.find('#callsign').text(pilot.callsign);
     newSVG.find('#squawk').text(pilot.flight_plan.assigned_transponder);
     newSVG.find('#atyp').text("1 " + pilot.flight_plan.aircraft_faa);
     newSVG.find('#spd').text("N0" + pilot.flight_plan.cruise_tas);
-    newSVG.find('#deptime').text(pilot.flight_plan.deptime);
-    newSVG.find('#eet').text(pilot.flight_plan.enroute_time);
+    //newSVG.find('#eet').text(pilot.flight_plan.enroute_time);
     newSVG.find('#frul').text(pilot.flight_plan.flight_rules);
-    newSVG.find('#adepades').text(pilot.flight_plan.departure + " " + pilot.flight_plan.arrival);
     if (pilot.flight_plan.altitude <= 5000) {
         newSVG.find('#rfl').text("A0" + (pilot.flight_plan.altitude / 100));
     } else if (pilot.flight_plan.altitude > 5000 && pilot.flight_plan.altitude < 10000) {
@@ -286,14 +290,20 @@ function createSvg(pilot) {
         // departure strip default = blue
         newSVG.find('.stripBorder').attr('class', 'stripBorder blueStrip');
         newSVG.find(`#changeColor${uniqueId}`).css('background-color', '#047DBE');
+        newSVG.find('#adepades').html(pilot.flight_plan.departure + " " + pilot.flight_plan.arrival + "<tspan font-size='10'>" + pilot.flight_plan.enroute_time + "</tspan>");
+        newSVG.find('#deptime').text(pilot.flight_plan.deptime);
     } else if (pilot.flight_plan.arrival == document.getElementById('airports').value) {
         // arrival strip default = red
         newSVG.find('.stripBorder').attr('class', 'stripBorder redStrip');
         newSVG.find(`#changeColor${uniqueId}`).css('background-color', '#93100F');
+        newSVG.find('#adepades').html(pilot.flight_plan.departure + "<tspan font-size='10'>" + pilot.flight_plan.deptime + "</tspan>" + pilot.flight_plan.arrival + "<tspan font-size='10'>" + pilot.flight_plan.enroute_time + "</tspan>");
+        newSVG.find('#deptime').text("");
     } else {
         // strip default = black (also military)
         newSVG.find('.stripBorder').attr('class', 'stripBorder blackStrip');
         newSVG.find(`#changeColor${uniqueId}`).css('background-color', '#111111');
+        newSVG.find('#adepades').html(pilot.flight_plan.departure + "<tspan font-size='10'>" + pilot.flight_plan.deptime + "</tspan>" + pilot.flight_plan.arrival + "<tspan font-size='10'>" + pilot.flight_plan.enroute_time + "</tspan>");
+        newSVG.find('#deptime').text("");
     }
     if (pilot.flight_plan.flight_rules != "I") {
         // VFR (local) strip default = yellow
@@ -308,6 +318,104 @@ function createSvg(pilot) {
     newSVG.find('#stripId').text(stripIds + "NOTI");
     newSVG.draggable();
     $('#container').append(newSVG);
+
+    // Initialize variables for drawing
+    const drawArea = newSVG.find(`#drawArea${uniqueId}`);
+    const penTool = newSVG.find(`#penTool${uniqueId}`);
+
+    // Set up penTool click event
+    penTool.click(function() {
+        let currentTool = $(this); // this refers to the clicked penTool button
+        let associatedDrawArea = currentTool.siblings("svg"); // gets the sibling SVG of the clicked penTool button
+
+        if (currentTool.find('i').hasClass('fa-pen')) { // Activate draw mode
+            console.log("pen tool activated");
+            currentTool.find('i').removeClass('fa-pen').addClass('fa-check');
+            associatedDrawArea.css('pointer-events', 'all');
+            newSVG.draggable('disable');
+        } else { // Deactivate draw mode
+            console.log("pen tool disabled");
+            currentTool.find('i').removeClass('fa-check').addClass('fa-pen');
+            associatedDrawArea.css('pointer-events', 'none');
+            newSVG.draggable('enable');
+        }
+    });
+
+    // Set up draw area events
+    let lines = [];
+    let line = null;
+    let drawing = false;
+    let svgns = "http://www.w3.org/2000/svg";
+    let clearButton = $(`#clearButton${uniqueId}`);
+    
+    drawArea.mousedown(function(event) {
+        if (penTool.find('i').hasClass('fa-check')) {
+            const rect = drawArea[0].getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            line = document.createElementNS(svgns, 'line');
+            line.setAttribute('x1', x);
+            line.setAttribute('y1', y);
+            line.setAttribute('x2', x);
+            line.setAttribute('y2', y);
+            line.setAttribute('style', 'stroke:rgb(0,0,0);stroke-width:1');
+            drawArea[0].appendChild(line);
+            lines.push(line);
+            drawing = true;
+        }
+    });
+    
+    drawArea.mousemove(function(event) {
+        if (drawing) {
+            const rect = drawArea[0].getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            let newLine = document.createElementNS(svgns, 'line');
+            newLine.setAttribute('x1', line.getAttribute('x2'));
+            newLine.setAttribute('y1', line.getAttribute('y2'));
+            newLine.setAttribute('x2', x);
+            newLine.setAttribute('y2', y);
+            newLine.setAttribute('style', 'stroke:rgb(0,0,0);stroke-width:1');
+            drawArea[0].appendChild(newLine);
+            lines.push(newLine);
+            line = newLine;
+        }
+    });
+    
+    drawArea.mouseup(function() {
+        drawing = false;
+    });
+    
+    clearButton.click(function() {
+        while(lines.length > 0) {
+            let lineToRemove = lines.pop();
+            drawArea[0].removeChild(lineToRemove);
+        }
+    });
+
+    // create a style element
+    var style = document.createElement('style');
+    style.innerHTML = `
+    @media print {
+        body * {
+        visibility: hidden;
+        }
+        #movableDiv${uniqueId}, #movableDiv${uniqueId} * {
+        visibility: visible;
+        }
+        #movableDiv${uniqueId} {
+        position: absolute;
+        left: 0;
+        top: 0;
+        }
+    }`;
+
+    // append the style element to the head of the document
+    document.head.appendChild(style);
+    let printButton = $(`#printBtn${uniqueId}`);
+    printButton.on('click', function() {
+    window.print();
+    });
 }
 
 function changeStripColor(id, buttonId) {
@@ -337,25 +445,28 @@ $(document).on('click', '.movableSVG', function(event) {
     event.stopPropagation();
     let mouseX = event.pageX - $(this).offset().left;
     let mouseY = event.pageY - $(this).offset().top;
-    
+
     if (mouseY > 100) {
         return;
     }
 
-    let newDiv = $('<div class="editableDiv" contenteditable="true" style="position:absolute; font-family: \'Indie Flower\', cursive; color: darkblue; font-size: 13pt;"></div>')
-    .css('left', mouseX + 'px')
-    .css('top', mouseY + 'px')
-    .appendTo($(this))
-    .focus();    
+    let newDiv = $('<div class="editableDiv" contenteditable="true" style="position:absolute; font-family: \'Indie Flower\', cursive; color: darkblue; font-size: 13pt; line-height: 1;"></div>')
+        .css('left', mouseX + 'px')
+        .css('top', mouseY + 'px')
+        .appendTo($(this))
+        .focus();
 
     newDiv.on('blur', function() {
-        if($(this).text().trim() === '') {
+        if ($(this).text().trim() === '') {
             $(this).remove();
         }
     });
 
     newDiv.on('click', function(event) {
         event.stopPropagation();
-        $(this).remove();
+    });
+
+    newDiv.on('mousedown', function(event) {
+        event.stopPropagation();
     });
 });
