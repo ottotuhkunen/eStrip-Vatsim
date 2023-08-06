@@ -226,7 +226,7 @@ let line;
 function createSvg(pilot) {
     let uniqueId = pilot.callsign;
     let newSVG = $(`<div class='movableSVG'> <div id="stripBorder${uniqueId}" class="stripBorder blackStrip">
-        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+        <svg version="1.1" id="svgBase${uniqueId}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
             viewBox="0 0 488 71" style="enable-background:new 0 0 488 71; background-color:white;" xml:space="preserve">
             <text id="callsign" transform="matrix(1 0 0 1 16 15.9116)" class="st0 st1">OHCAQ</text>
             <text id="rwy" transform="matrix(1 0 0 1 295.1016 15.9116)" class="st0 st1">--</text>
@@ -341,73 +341,94 @@ function createSvg(pilot) {
         }
     });
 
-    // Set up draw area events
-    let lines = [];
-    let line = null;
-    let drawing = false;
-    let svgns = "http://www.w3.org/2000/svg";
-    let clearButton = $(`#clearButton${uniqueId}`);
+// Set up draw area events
+let lines = [];
+let line = null;
+let drawing = false;
+let svgns = "http://www.w3.org/2000/svg";
+let clearButton = $(`#clearButton${uniqueId}`);
+
+drawArea.on('mousedown touchstart', function(event) {
+    event.preventDefault(); // Prevent default touch behavior (e.g., scrolling)
     
-    drawArea.mousedown(function(event) {
-        if (penTool.find('i').hasClass('fa-check')) {
-            const rect = drawArea[0].getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            line = document.createElementNS(svgns, 'line');
-            line.setAttribute('x1', x);
-            line.setAttribute('y1', y);
-            line.setAttribute('x2', x);
-            line.setAttribute('y2', y);
-            line.setAttribute('style', 'stroke:rgb(0,0,0);stroke-width:1');
-            drawArea[0].appendChild(line);
-            lines.push(line);
-            drawing = true;
+    if (penTool.find('i').hasClass('fa-check')) {
+        const rect = drawArea[0].getBoundingClientRect();
+        let x, y;
+        
+        if (event.type === 'touchstart') {
+            const touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+            x = touch.clientX - rect.left;
+            y = touch.clientY - rect.top;
+        } else {
+            x = event.clientX - rect.left;
+            y = event.clientY - rect.top;
         }
-    });
-    
-    drawArea.mousemove(function(event) {
-        if (drawing) {
-            const rect = drawArea[0].getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            let newLine = document.createElementNS(svgns, 'line');
-            newLine.setAttribute('x1', line.getAttribute('x2'));
-            newLine.setAttribute('y1', line.getAttribute('y2'));
-            newLine.setAttribute('x2', x);
-            newLine.setAttribute('y2', y);
-            newLine.setAttribute('style', 'stroke:rgb(0,0,0);stroke-width:1');
-            drawArea[0].appendChild(newLine);
-            lines.push(newLine);
-            line = newLine;
+
+        line = document.createElementNS(svgns, 'line');
+        line.setAttribute('x1', x);
+        line.setAttribute('y1', y);
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', y);
+        line.setAttribute('style', 'stroke:rgb(0,0,0);stroke-width:1');
+        drawArea[0].appendChild(line);
+        lines.push(line);
+        drawing = true;
+    }
+});
+
+drawArea.on('mousemove touchmove', function(event) {
+    event.preventDefault(); // Prevent default touch behavior (e.g., scrolling)
+
+    if (drawing) {
+        const rect = drawArea[0].getBoundingClientRect();
+        let x, y;
+        
+        if (event.type === 'touchmove') {
+            const touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+            x = touch.clientX - rect.left;
+            y = touch.clientY - rect.top;
+        } else {
+            x = event.clientX - rect.left;
+            y = event.clientY - rect.top;
         }
-    });
-    
-    drawArea.mouseup(function() {
-        drawing = false;
-    });
-    
-    clearButton.click(function() {
-        while(lines.length > 0) {
-            let lineToRemove = lines.pop();
-            drawArea[0].removeChild(lineToRemove);
-        }
-    });
+
+        let newLine = document.createElementNS(svgns, 'line');
+        newLine.setAttribute('x1', line.getAttribute('x2'));
+        newLine.setAttribute('y1', line.getAttribute('y2'));
+        newLine.setAttribute('x2', x);
+        newLine.setAttribute('y2', y);
+        newLine.setAttribute('style', 'stroke:rgb(0,0,0);stroke-width:1');
+        drawArea[0].appendChild(newLine);
+        lines.push(newLine);
+        line = newLine;
+    }
+});
+
+drawArea.on('mouseup touchend', function() {
+    drawing = false;
+});
+
+clearButton.click(function() {
+    while (lines.length > 0) {
+        let lineToRemove = lines.pop();
+        drawArea[0].removeChild(lineToRemove);
+    }
+});
 
     // create a style element
     var style = document.createElement('style');
     style.innerHTML = `
     @media print {
-        body * {
+        body > * {
         visibility: hidden;
         }
-        #movableDiv${uniqueId}, #movableDiv${uniqueId} * {
+        #container {
+        visibility: hidden;
+        }
+        #svgBase${uniqueId}, #svgBase${uniqueId} * {
         visibility: visible;
         }
-        #movableDiv${uniqueId} {
-        position: absolute;
-        left: 0;
-        top: 0;
-        }
+        
     }`;
 
     // append the style element to the head of the document
@@ -441,10 +462,23 @@ function changeStripColor(id, buttonId) {
     }
 }
 
-$(document).on('click', '.movableSVG', function(event) {
+$(document).on('click touchstart', '.movableSVG', function(event) {
     event.stopPropagation();
-    let mouseX = event.pageX - $(this).offset().left;
-    let mouseY = event.pageY - $(this).offset().top;
+
+    // Check if it's a touch event or mouse event
+    let isTouch = event.type === 'touchstart';
+
+    let mouseX, mouseY;
+    if (isTouch) {
+        // Touch event handling
+        let touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+        mouseX = touch.pageX - $(this).offset().left;
+        mouseY = touch.pageY - $(this).offset().top;
+    } else {
+        // Mouse event handling
+        mouseX = event.pageX - $(this).offset().left;
+        mouseY = event.pageY - $(this).offset().top;
+    }
 
     if (mouseY > 100) {
         return;
@@ -466,7 +500,7 @@ $(document).on('click', '.movableSVG', function(event) {
         event.stopPropagation();
     });
 
-    newDiv.on('mousedown', function(event) {
+    newDiv.on('mousedown touchstart', function(event) {
         event.stopPropagation();
     });
 });
