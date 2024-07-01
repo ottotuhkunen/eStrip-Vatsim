@@ -3,6 +3,10 @@
 The eStip web application is designed to be used for VATSIM simulation purposes only at Finnish regional aerodromes.
 This app is simulating real life air traffic controller flight progress strips in Finnish air traffic control towers.
 
+**Flight simulation purposes only!**
+
+- [**Link to application**](https://estrip.lusep.fi/)
+
 ### Features
 - Fetch flight data from VATSIM json API
 - Display aircraft data on a flight strip format
